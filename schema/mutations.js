@@ -2,6 +2,9 @@ const graphql = require("graphql");
 const { GraphQLObjectType, GraphQLString, GraphQLNonNull } = graphql;
 const mongoose = require("mongoose");
 const UserType = require("./user_type");
+const PostType = require("./post_type");
+const Post = require("../models/Post")
+
 
 const AuthService = require("../services/auth");
 
@@ -38,6 +41,22 @@ const mutation = new GraphQLObjectType({
       },
       resolve(_, args) {
         return AuthService.verifyUser(args);
+      }
+    },
+    createPost: {
+      type: PostType,
+      args: {
+        title: { type: GraphQLString },
+        body: { type: GraphQLString }
+      },
+      async resolve(_, { title, body }, context) { 
+        const validUser = await AuthService.verifyUser({ token: context.token });
+        if (validUser.loggedIn) {
+          const id = validUser.id;
+          return new Post({ title, id, body }).save();
+        } else {
+          throw new Error("Sorry, you need to be logged in to create a post.");
+        }
       }
     }
   }

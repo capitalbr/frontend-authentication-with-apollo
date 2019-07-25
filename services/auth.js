@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const key = require("../config/keys").secretOrkey;
+const key = require("../config/keys").secretOrKey;
 
 const validateRegisterInput = require("../validation/register");
 const validateLoginInput = require("../validation/login");
@@ -78,8 +78,8 @@ const verifyUser = async data => {
     const loggedIn = await User.findById(id).then(user => {
       return user ? true : false;
     });
-
-    return { loggedIn };
+    
+    return { loggedIn, id };
   } catch (err) {
     return { loggedIn: false };
   }

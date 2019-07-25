@@ -25,12 +25,18 @@ app.use(bodyParser.json());
 // in the object passed to the expressGraphQL function
 app.use(
   "/graphql",
-  expressGraphQL({
-    schema,
-    // allowing us to use GraphiQL in a dev environment
-    graphiql: true
-  })
-);
+  expressGraphQL( req => {
+    return({
+      schema,
+      // we are receiving the request and can check for our
+      // auth token under headers
+      context: {
+        token: req.headers.authorization
+      },
+      // allowing us to use GraphiQL in a dev environment
+      graphiql: true
+    })
+  }));
 
 // Setup up webpack middleware once we get to our frontend
 const webpackMiddleware = require("webpack-dev-middleware");
